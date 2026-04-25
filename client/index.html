@@ -1,722 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LAN Radio</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAN Radio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap');
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #0a0a0a;
-      --panel: #111111;
-      --panel2: #0d0d0d;
-      --border: #222222;
-      --border2: #1a1a1a;
-      --amber: #f5a623;
-      --amber-dim: #7a5312;
-      --green: #39ff14;
-      --red: #ff3b30;
-      --blue: #4fc3f7;
-      --text: #e8e8e0;
-      --muted: #444444;
-      --mono: 'Share Tech Mono', monospace;
-      --title: 'Bebas Neue', sans-serif;
-    }
+  :root {
+    --bg:         #0a0a0a;
+    --panel:      #111111;
+    --panel2:     #0d0d0d;
+    --border:     #222222;
+    --border2:    #1a1a1a;
+    --amber:      #f5a623;
+    --amber-dim:  #7a5312;
+    --green:      #39ff14;
+    --red:        #ff3b30;
+    --blue:       #4fc3f7;
+    --text:       #e8e8e0;
+    --muted:      #444444;
+    --mono:       'Share Tech Mono', monospace;
+    --title:      'Bebas Neue', sans-serif;
+  }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 24px 16px;
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
+  }
 
-    .radio {
-      width: 100%;
-      max-width: 520px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 28px;
-      position: relative;
-    }
+  .radio {
+    width: 100%;
+    max-width: 520px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 28px;
+    position: relative;
+  }
 
-    /* CRT scanline texture */
-    .radio::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(0deg,
-          transparent, transparent 2px,
-          rgba(0, 0, 0, 0.06) 2px, rgba(0, 0, 0, 0.06) 4px);
-      pointer-events: none;
-      border-radius: 3px;
-    }
+  /* CRT scanline texture */
+  .radio::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent, transparent 2px,
+      rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    border-radius: 3px;
+  }
 
-    /* ── Header ─────────────────────────────────────────────────────────── */
-    .header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 16px;
-    }
+  /* ── Header ─────────────────────────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
 
-    .brand {
-      font-family: var(--title);
-      font-size: 42px;
-      letter-spacing: 3px;
-      color: var(--amber);
-      line-height: 1;
-    }
+  .brand {
+    font-family: var(--title);
+    font-size: 42px;
+    letter-spacing: 3px;
+    color: var(--amber);
+    line-height: 1;
+  }
 
-    .on-air {
-      font-size: 10px;
-      letter-spacing: 3px;
-      color: var(--red);
-      opacity: 0;
-      transition: opacity 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+  .on-air {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .on-air.visible { opacity: 1; }
 
-    .on-air.visible {
-      opacity: 1;
-    }
+  .on-air-dot {
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: blink-dot 1s ease-in-out infinite;
+  }
+  @keyframes blink-dot { 0%,100% { opacity:1; } 50% { opacity:0.15; } }
 
-    .on-air-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--red);
-      border-radius: 50%;
-      animation: blink-dot 1s ease-in-out infinite;
-    }
+  /* ── VU meter (dual channel) ─────────────────────────────────────────── */
+  .vu-section { margin-bottom: 20px; }
 
-    @keyframes blink-dot {
+  .vu-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
 
-      0%,
-      100% {
-        opacity: 1;
-      }
+  .vu-ch {
+    display: flex;
+    gap: 2px;
+    height: 10px;
+    margin-bottom: 3px;
+  }
 
-      50% {
-        opacity: 0.15;
-      }
-    }
+  .vu-bar             { flex: 1; background: var(--border2); border-radius: 1px; }
+  .vu-bar.on          { background: var(--green); }
+  .vu-bar.on.peak     { background: var(--amber); }
+  .vu-bar.on.clip     { background: var(--red);   }
 
-    /* ── VU meter (dual channel) ─────────────────────────────────────────── */
-    .vu-section {
-      margin-bottom: 20px;
-    }
+  /* ── Stats display ───────────────────────────────────────────────────── */
+  .display {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    font-size: 11px;
+  }
 
-    .vu-label {
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 3px;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-    }
+  .display-section {
+    border-bottom: 1px solid var(--border2);
+    padding: 10px 14px;
+  }
+  .display-section:last-child { border-bottom: none; }
 
-    .vu-ch {
-      display: flex;
-      gap: 2px;
-      height: 10px;
-      margin-bottom: 3px;
-    }
+  .section-title {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
 
-    .vu-bar {
-      flex: 1;
-      background: var(--border2);
-      border-radius: 1px;
-    }
+  .stat-grid        { display: grid; grid-template-columns: 1fr 1fr;    gap: 4px 16px; }
+  .stat-grid.cols3  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 12px; }
 
-    .vu-bar.on {
-      background: var(--green);
-    }
+  .stat   { display: flex; justify-content: space-between; align-items: baseline; }
+  .stat-k { color: var(--muted); font-size: 10px; white-space: nowrap; }
+  .stat-v { color: var(--text);  font-size: 11px; text-align: right; }
 
-    .vu-bar.on.peak {
-      background: var(--amber);
-    }
+  .stat-v.ok   { color: var(--green); }
+  .stat-v.warn { color: var(--amber); }
+  .stat-v.err  { color: var(--red);   }
+  .stat-v.info { color: var(--blue);  }
 
-    .vu-bar.on.clip {
-      background: var(--red);
-    }
+  /* Sparklines */
+  .sparkline-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .spark-label { font-size: 9px; color: var(--muted); letter-spacing: 2px; min-width: 40px; }
+  canvas.spark { flex: 1; height: 24px; }
 
-    /* ── Stats display ───────────────────────────────────────────────────── */
-    .display {
-      background: var(--panel2);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      margin-bottom: 20px;
-      overflow: hidden;
-      font-size: 11px;
-    }
+  /* ── Tune button ─────────────────────────────────────────────────────── */
+  .btn {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 13px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, opacity 0.15s;
+  }
+  .btn:hover    { border-color: var(--amber); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn.tuning   { animation: blink-btn 1s ease-in-out infinite; }
+  @keyframes blink-btn { 0%,100% { border-color: var(--amber-dim); } 50% { border-color: var(--amber); } }
 
-    .display-section {
-      border-bottom: 1px solid var(--border2);
-      padding: 10px 14px;
-    }
+  /* ── Volume ──────────────────────────────────────────────────────────── */
+  .vol-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .vol-lbl { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
 
-    .display-section:last-child {
-      border-bottom: none;
-    }
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1; height: 2px;
+    background: var(--border);
+    outline: none; cursor: pointer; border-radius: 1px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    background: var(--amber); border-radius: 50%; cursor: pointer;
+  }
+  .vol-val { font-size: 10px; color: var(--muted); min-width: 34px; text-align: right; }
 
-    .section-title {
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px 16px;
-    }
-
-    .stat-grid.cols3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 4px 12px;
-    }
-
-    .stat {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    .stat-k {
-      color: var(--muted);
-      font-size: 10px;
-      white-space: nowrap;
-    }
-
-    .stat-v {
-      color: var(--text);
-      font-size: 11px;
-      text-align: right;
-    }
-
-    .stat-v.ok {
-      color: var(--green);
-    }
-
-    .stat-v.warn {
-      color: var(--amber);
-    }
-
-    .stat-v.err {
-      color: var(--red);
-    }
-
-    .stat-v.info {
-      color: var(--blue);
-    }
-
-    /* Sparklines */
-    .sparkline-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .spark-label {
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 2px;
-      min-width: 40px;
-    }
-
-    canvas.spark {
-      flex: 1;
-      height: 24px;
-    }
-
-    /* ── Tune button ─────────────────────────────────────────────────────── */
-    .btn {
-      width: 100%;
-      background: none;
-      border: 1px solid var(--amber-dim);
-      color: var(--amber);
-      font-family: var(--mono);
-      font-size: 13px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      padding: 13px;
-      cursor: pointer;
-      border-radius: 2px;
-      transition: border-color 0.15s, opacity 0.15s;
-    }
-
-    .btn:hover {
-      border-color: var(--amber);
-    }
-
-    .btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .btn.tuning {
-      animation: blink-btn 1s ease-in-out infinite;
-    }
-
-    @keyframes blink-btn {
-
-      0%,
-      100% {
-        border-color: var(--amber-dim);
-      }
-
-      50% {
-        border-color: var(--amber);
-      }
-    }
-
-    /* ── Volume ──────────────────────────────────────────────────────────── */
-    .vol-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .vol-lbl {
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 2px;
-    }
-
-    input[type=range] {
-      -webkit-appearance: none;
-      flex: 1;
-      height: 2px;
-      background: var(--border);
-      outline: none;
-      cursor: pointer;
-      border-radius: 1px;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      background: var(--amber);
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .vol-val {
-      font-size: 10px;
-      color: var(--muted);
-      min-width: 34px;
-      text-align: right;
-    }
-
-    audio {
-      display: none;
-    }
-  </style>
+  audio { display: none; }
+</style>
 </head>
-
 <body>
-  <div class="radio">
+<div class="radio">
 
-    <div class="header">
-      <div class="brand">LANFM</div>
-      <div class="on-air" id="on-air">
-        <div class="on-air-dot"></div>ON AIR
-      </div>
-    </div>
-
-    <!-- Dual-channel VU meter -->
-    <div class="vu-section">
-      <div class="vu-label"><span>L</span><span>R</span></div>
-      <div class="vu-ch" id="vu-l"></div>
-      <div class="vu-ch" id="vu-r"></div>
-    </div>
-
-    <!-- Stats -->
-    <div class="display">
-
-      <div class="display-section">
-        <div class="section-title">connection</div>
-        <div class="stat-grid">
-          <div class="stat"><span class="stat-k">STATUS</span> <span class="stat-v" id="s-status">STANDBY</span></div>
-          <div class="stat"><span class="stat-k">ICE</span> <span class="stat-v" id="s-ice">—</span></div>
-          <div class="stat"><span class="stat-k">TRANSPORT</span><span class="stat-v" id="s-transport">—</span></div>
-          <div class="stat"><span class="stat-k">CANDIDATE</span><span class="stat-v" id="s-candidate">—</span></div>
-        </div>
-      </div>
-
-      <div class="display-section">
-        <div class="section-title">codec</div>
-        <div class="stat-grid cols3">
-          <div class="stat"><span class="stat-k">CODEC</span> <span class="stat-v info" id="s-codec">—</span></div>
-          <div class="stat"><span class="stat-k">CLOCK</span> <span class="stat-v" id="s-clock">—</span></div>
-          <div class="stat"><span class="stat-k">CHANNELS</span><span class="stat-v" id="s-channels">—</span></div>
-        </div>
-      </div>
-
-      <div class="display-section">
-        <div class="section-title">latency</div>
-        <div class="stat-grid cols3">
-          <div class="stat"><span class="stat-k">E2E LAG</span> <span class="stat-v ok" id="s-e2e">—</span></div>
-          <div class="stat"><span class="stat-k">RTT</span> <span class="stat-v" id="s-rtt">—</span></div>
-          <div class="stat"><span class="stat-k">JITTER</span> <span class="stat-v" id="s-jitter">—</span></div>
-          <div class="stat"><span class="stat-k">JITTER BUF</span><span class="stat-v" id="s-buf">—</span></div>
-        </div>
-        <div class="sparkline-row">
-          <span class="spark-label">RTT</span>
-          <canvas class="spark" id="spark-rtt" width="400" height="24"></canvas>
-        </div>
-        <div class="sparkline-row">
-          <span class="spark-label">JITTER</span>
-          <canvas class="spark" id="spark-jitter" width="400" height="24"></canvas>
-        </div>
-      </div>
-
-      <div class="display-section">
-        <div class="section-title">stream</div>
-        <div class="stat-grid cols3">
-          <div class="stat"><span class="stat-k">PKTS RX</span><span class="stat-v" id="s-pkts">—</span></div>
-          <div class="stat"><span class="stat-k">LOST</span> <span class="stat-v" id="s-lost">—</span></div>
-          <div class="stat"><span class="stat-k">LOSS %</span> <span class="stat-v" id="s-losspct">—</span></div>
-          <div class="stat"><span class="stat-k">BITRATE</span><span class="stat-v info" id="s-bitrate">—</span></div>
-          <div class="stat"><span class="stat-k">DECODED</span><span class="stat-v" id="s-decoded">—</span></div>
-          <div class="stat"><span class="stat-k">ENERGY</span> <span class="stat-v info" id="s-energy">—</span></div>
-        </div>
-      </div>
-
-    </div>
-
-    <button class="btn" id="btn" onclick="toggle()">TUNE IN</button>
-
-    <div class="vol-row">
-      <span class="vol-lbl">VOL</span>
-      <input type="range" min="0" max="1" step="0.02" value="0.8"
-        oninput="audioEl.volume=+this.value; document.getElementById('vol-v').textContent=Math.round(this.value*100)+'%'">
-      <span class="vol-val" id="vol-v">80%</span>
+  <div class="header">
+    <div class="brand">LANFM</div>
+    <div class="on-air" id="on-air">
+      <div class="on-air-dot"></div>ON AIR
     </div>
   </div>
 
-  <audio id="audio-el" autoplay playsinline></audio>
+  <!-- Dual-channel VU meter -->
+  <div class="vu-section">
+    <div class="vu-label"><span>L</span><span>R</span></div>
+    <div class="vu-ch" id="vu-l"></div>
+    <div class="vu-ch" id="vu-r"></div>
+  </div>
 
-  <script>
-    // ── Constants ───────────────────────────────────────────────────────────────
-    const N_VU = 32;
-    const SPARK_LEN = 60;
-    const STAT_IDS = [
-      's-status', 's-ice', 's-transport', 's-candidate',
-      's-codec', 's-clock', 's-channels',
-      's-e2e', 's-rtt', 's-jitter', 's-buf',
-      's-pkts', 's-lost', 's-losspct', 's-bitrate', 's-decoded', 's-energy',
-    ];
+  <!-- Stats -->
+  <div class="display">
 
-    // ── DOM ─────────────────────────────────────────────────────────────────────
-    const audioEl = document.getElementById('audio-el');
-    const btn = document.getElementById('btn');
+    <div class="display-section">
+      <div class="section-title">connection</div>
+      <div class="stat-grid">
+        <div class="stat"><span class="stat-k">STATUS</span>   <span class="stat-v" id="s-status">STANDBY</span></div>
+        <div class="stat"><span class="stat-k">ICE</span>      <span class="stat-v" id="s-ice">—</span></div>
+        <div class="stat"><span class="stat-k">TRANSPORT</span><span class="stat-v" id="s-transport">—</span></div>
+        <div class="stat"><span class="stat-k">CANDIDATE</span><span class="stat-v" id="s-candidate">—</span></div>
+      </div>
+    </div>
 
-    // Build VU bars
-    ['vu-l', 'vu-r'].forEach(id => {
-      const el = document.getElementById(id);
-      for (let i = 0; i < N_VU; i++) {
-        const b = document.createElement('div');
-        b.className = 'vu-bar';
-        el.appendChild(b);
+    <div class="display-section">
+      <div class="section-title">codec</div>
+      <div class="stat-grid cols3">
+        <div class="stat"><span class="stat-k">CODEC</span>  <span class="stat-v info" id="s-codec">—</span></div>
+        <div class="stat"><span class="stat-k">CLOCK</span>  <span class="stat-v"      id="s-clock">—</span></div>
+        <div class="stat"><span class="stat-k">CHANNELS</span><span class="stat-v"     id="s-channels">—</span></div>
+      </div>
+    </div>
+
+    <div class="display-section">
+      <div class="section-title">latency</div>
+      <div class="stat-grid cols3">
+        <div class="stat"><span class="stat-k">E2E LAG</span>   <span class="stat-v ok" id="s-e2e">—</span></div>
+        <div class="stat"><span class="stat-k">RTT</span>       <span class="stat-v"    id="s-rtt">—</span></div>
+        <div class="stat"><span class="stat-k">JITTER</span>    <span class="stat-v"    id="s-jitter">—</span></div>
+        <div class="stat"><span class="stat-k">JITTER BUF</span><span class="stat-v"   id="s-buf">—</span></div>
+      </div>
+      <div class="sparkline-row">
+        <span class="spark-label">RTT</span>
+        <canvas class="spark" id="spark-rtt" width="400" height="24"></canvas>
+      </div>
+      <div class="sparkline-row">
+        <span class="spark-label">JITTER</span>
+        <canvas class="spark" id="spark-jitter" width="400" height="24"></canvas>
+      </div>
+    </div>
+
+    <div class="display-section">
+      <div class="section-title">stream</div>
+      <div class="stat-grid cols3">
+        <div class="stat"><span class="stat-k">PKTS RX</span><span class="stat-v"      id="s-pkts">—</span></div>
+        <div class="stat"><span class="stat-k">LOST</span>   <span class="stat-v"      id="s-lost">—</span></div>
+        <div class="stat"><span class="stat-k">LOSS %</span> <span class="stat-v"      id="s-losspct">—</span></div>
+        <div class="stat"><span class="stat-k">BITRATE</span><span class="stat-v info" id="s-bitrate">—</span></div>
+        <div class="stat"><span class="stat-k">DECODED</span><span class="stat-v"      id="s-decoded">—</span></div>
+        <div class="stat"><span class="stat-k">ENERGY</span> <span class="stat-v info" id="s-energy">—</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="btn" id="btn" onclick="toggle()">TUNE IN</button>
+
+  <div class="vol-row">
+    <span class="vol-lbl">VOL</span>
+    <input type="range" min="0" max="1" step="0.02" value="0.8"
+      oninput="audioEl.volume=+this.value; document.getElementById('vol-v').textContent=Math.round(this.value*100)+'%'">
+    <span class="vol-val" id="vol-v">80%</span>
+  </div>
+</div>
+
+<audio id="audio-el" autoplay playsinline></audio>
+
+<script>
+// ── Constants ───────────────────────────────────────────────────────────────
+const N_VU      = 32;
+const SPARK_LEN = 60;
+const STAT_IDS  = [
+  's-status','s-ice','s-transport','s-candidate',
+  's-codec','s-clock','s-channels',
+  's-e2e','s-rtt','s-jitter','s-buf',
+  's-pkts','s-lost','s-losspct','s-bitrate','s-decoded','s-energy',
+];
+
+// ── DOM ─────────────────────────────────────────────────────────────────────
+const audioEl = document.getElementById('audio-el');
+const btn     = document.getElementById('btn');
+
+// Build VU bars
+['vu-l', 'vu-r'].forEach(id => {
+  const el = document.getElementById(id);
+  for (let i = 0; i < N_VU; i++) {
+    const b = document.createElement('div');
+    b.className = 'vu-bar';
+    el.appendChild(b);
+  }
+});
+const barsL = [...document.getElementById('vu-l').children];
+const barsR = [...document.getElementById('vu-r').children];
+
+// ── State ───────────────────────────────────────────────────────────────────
+let pc = null, ws = null, active = false;
+let vuRaf = null, analyser = null, statsTimer = null;
+let prevBytes = 0, prevTs = 0;
+const rttHistory     = [];
+const jitterHistory  = [];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function set(id, val, cls = '') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val;
+  el.className = 'stat-v' + (cls ? ' ' + cls : '');
+}
+
+function iceClass(state) {
+  return ['connected','completed'].includes(state) ? 'ok' : state === 'failed' ? 'err' : 'warn';
+}
+
+// ── Sparklines ───────────────────────────────────────────────────────────────
+function drawSpark(canvasId, history, color, maxVal) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || history.length < 2) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.offsetWidth || canvas.width;
+  canvas.width = w;
+  ctx.clearRect(0, 0, w, canvas.height);
+  const h   = canvas.height;
+  const max = maxVal || Math.max(...history, 1);
+  ctx.strokeStyle = color;
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  history.forEach((v, i) => {
+    const x = (i / (SPARK_LEN - 1)) * w;
+    const y = h - (v / max) * (h - 2) - 1;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.lineTo((history.length - 1) / (SPARK_LEN - 1) * w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = color + '22';
+  ctx.fill();
+}
+
+// ── Stats polling (1 Hz) ─────────────────────────────────────────────────────
+async function pollStats() {
+  if (!pc) return;
+  const stats = await pc.getStats();
+  const now   = Date.now();
+  let rttMs   = null;
+
+  stats.forEach(s => {
+
+    // Codec
+    if (s.type === 'codec' && s.mimeType?.includes('audio')) {
+      set('s-codec',    s.mimeType.split('/')[1].toUpperCase(), 'info');
+      set('s-clock',    s.clockRate ? (s.clockRate / 1000) + ' kHz' : '—');
+      set('s-channels', s.channels ?? '—');
+    }
+
+    // Inbound RTP — stream health
+    if (s.type === 'inbound-rtp' && s.kind === 'audio') {
+      const pkts     = s.packetsReceived || 0;
+      const lost     = s.packetsLost     || 0;
+      const total    = pkts + lost;
+      const lossPct  = total > 0 ? ((lost / total) * 100).toFixed(1) : '0.0';
+      const lossClass = parseFloat(lossPct) > 2 ? 'err' : parseFloat(lossPct) > 0.5 ? 'warn' : 'ok';
+
+      set('s-pkts',    pkts.toLocaleString());
+      set('s-lost',    lost.toLocaleString(), lost > 0 ? 'warn' : '');
+      set('s-losspct', lossPct + '%', lossClass);
+      set('s-decoded', s.totalSamplesDecoded ? (s.totalSamplesDecoded / 1000).toFixed(0) + 'k' : '—');
+
+      if (s.totalAudioEnergy !== undefined)
+        set('s-energy', s.totalAudioEnergy.toFixed(3), 'info');
+
+      // Jitter
+      if (s.jitter !== undefined) {
+        const jMs = Math.round(s.jitter * 1000);
+        set('s-jitter', jMs + ' ms', jMs > 20 ? 'warn' : '');
+        jitterHistory.push(jMs);
+        if (jitterHistory.length > SPARK_LEN) jitterHistory.shift();
       }
-    });
-    const barsL = [...document.getElementById('vu-l').children];
-    const barsR = [...document.getElementById('vu-r').children];
 
-    // ── State ───────────────────────────────────────────────────────────────────
-    let pc = null, ws = null, active = false;
-    let vuRaf = null, analyser = null, statsTimer = null;
-    let prevBytes = 0, prevTs = 0;
-    const rttHistory = [];
-    const jitterHistory = [];
-
-    // ── Helpers ──────────────────────────────────────────────────────────────────
-    function set(id, val, cls = '') {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.textContent = val;
-      el.className = 'stat-v' + (cls ? ' ' + cls : '');
-    }
-
-    function iceClass(state) {
-      return ['connected', 'completed'].includes(state) ? 'ok' : state === 'failed' ? 'err' : 'warn';
-    }
-
-    // ── Sparklines ───────────────────────────────────────────────────────────────
-    function drawSpark(canvasId, history, color, maxVal) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas || history.length < 2) return;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.offsetWidth || canvas.width;
-      canvas.width = w;
-      ctx.clearRect(0, 0, w, canvas.height);
-      const h = canvas.height;
-      const max = maxVal || Math.max(...history, 1);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      history.forEach((v, i) => {
-        const x = (i / (SPARK_LEN - 1)) * w;
-        const y = h - (v / max) * (h - 2) - 1;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-      ctx.lineTo((history.length - 1) / (SPARK_LEN - 1) * w, h);
-      ctx.lineTo(0, h);
-      ctx.closePath();
-      ctx.fillStyle = color + '22';
-      ctx.fill();
-    }
-
-    // ── Stats polling (1 Hz) ─────────────────────────────────────────────────────
-    async function pollStats() {
-      if (!pc) return;
-      const stats = await pc.getStats();
-      const now = Date.now();
-      let rttMs = null;
-
-      stats.forEach(s => {
-
-        // Codec
-        if (s.type === 'codec' && s.mimeType?.includes('audio')) {
-          set('s-codec', s.mimeType.split('/')[1].toUpperCase(), 'info');
-          set('s-clock', s.clockRate ? (s.clockRate / 1000) + ' kHz' : '—');
-          set('s-channels', s.channels ?? '—');
-        }
-
-        // Inbound RTP — stream health
-        if (s.type === 'inbound-rtp' && s.kind === 'audio') {
-          const pkts = s.packetsReceived || 0;
-          const lost = s.packetsLost || 0;
-          const total = pkts + lost;
-          const lossPct = total > 0 ? ((lost / total) * 100).toFixed(1) : '0.0';
-          const lossClass = parseFloat(lossPct) > 2 ? 'err' : parseFloat(lossPct) > 0.5 ? 'warn' : 'ok';
-
-          set('s-pkts', pkts.toLocaleString());
-          set('s-lost', lost.toLocaleString(), lost > 0 ? 'warn' : '');
-          set('s-losspct', lossPct + '%', lossClass);
-          set('s-decoded', s.totalSamplesDecoded ? (s.totalSamplesDecoded / 1000).toFixed(0) + 'k' : '—');
-
-          if (s.totalAudioEnergy !== undefined)
-            set('s-energy', s.totalAudioEnergy.toFixed(3), 'info');
-
-          // Jitter
-          if (s.jitter !== undefined) {
-            const jMs = Math.round(s.jitter * 1000);
-            set('s-jitter', jMs + ' ms', jMs > 20 ? 'warn' : '');
-            jitterHistory.push(jMs);
-            if (jitterHistory.length > SPARK_LEN) jitterHistory.shift();
-          }
-
-          // Jitter buffer delay — best available proxy for output audio delay
-          if (s.jitterBufferDelay !== undefined && s.jitterBufferEmittedCount) {
-            const bufMs = Math.round((s.jitterBufferDelay / s.jitterBufferEmittedCount) * 1000);
-            set('s-buf', bufMs + ' ms', bufMs > 100 ? 'warn' : '');
-            const e2e = bufMs + (rttMs !== null ? rttMs / 2 : 0);
-            set('s-e2e', Math.round(e2e) + ' ms', e2e > 500 ? 'err' : e2e > 200 ? 'warn' : 'ok');
-          }
-
-          // Bitrate
-          if (prevTs && s.bytesReceived !== undefined) {
-            const kbps = Math.round(((s.bytesReceived - prevBytes) * 8) / ((now - prevTs) / 1000) / 1000);
-            set('s-bitrate', kbps + ' kbps', kbps < 20 ? 'warn' : 'info');
-          }
-          prevBytes = s.bytesReceived || 0;
-        }
-
-        // RTT — prefer remote-inbound-rtp, fall back to candidate-pair
-        if (s.type === 'remote-inbound-rtp' && s.kind === 'audio' && s.roundTripTime !== undefined)
-          rttMs = Math.round(s.roundTripTime * 1000);
-
-        if (s.type === 'candidate-pair' && s.state === 'succeeded' && s.nominated) {
-          set('s-transport', 'NOMINATED', 'ok');
-          if (rttMs === null && s.currentRoundTripTime !== undefined)
-            rttMs = Math.round(s.currentRoundTripTime * 1000);
-        }
-      });
-
-      if (rttMs !== null) {
-        set('s-rtt', rttMs + ' ms', rttMs > 100 ? 'warn' : 'ok');
-        rttHistory.push(rttMs);
-        if (rttHistory.length > SPARK_LEN) rttHistory.shift();
+      // Jitter buffer delay — best available proxy for output audio delay
+      if (s.jitterBufferDelay !== undefined && s.jitterBufferEmittedCount) {
+        const bufMs = Math.round((s.jitterBufferDelay / s.jitterBufferEmittedCount) * 1000);
+        set('s-buf', bufMs + ' ms', bufMs > 100 ? 'warn' : '');
+        const e2e = bufMs + (rttMs !== null ? rttMs / 2 : 0);
+        set('s-e2e', Math.round(e2e) + ' ms', e2e > 500 ? 'err' : e2e > 200 ? 'warn' : 'ok');
       }
 
-      prevTs = now;
-      if (pc) set('s-ice', pc.iceConnectionState.toUpperCase(), iceClass(pc.iceConnectionState));
-
-      drawSpark('spark-rtt', rttHistory, '#39ff14', 200);
-      drawSpark('spark-jitter', jitterHistory, '#f5a623', 50);
+      // Bitrate
+      if (prevTs && s.bytesReceived !== undefined) {
+        const kbps = Math.round(((s.bytesReceived - prevBytes) * 8) / ((now - prevTs) / 1000) / 1000);
+        set('s-bitrate', kbps + ' kbps', kbps < 20 ? 'warn' : 'info');
+      }
+      prevBytes = s.bytesReceived || 0;
     }
 
-    // ── Connect ──────────────────────────────────────────────────────────────────
-    function toggle() { active ? hangup() : connect(); }
+    // RTT — prefer remote-inbound-rtp, fall back to candidate-pair
+    if (s.type === 'remote-inbound-rtp' && s.kind === 'audio' && s.roundTripTime !== undefined)
+      rttMs = Math.round(s.roundTripTime * 1000);
 
-    async function connect() {
-      btn.disabled = true;
-      btn.classList.add('tuning');
-      btn.textContent = 'TUNING...';
-      set('s-status', 'CONNECTING', 'warn');
+    if (s.type === 'candidate-pair' && s.state === 'succeeded' && s.nominated) {
+      set('s-transport', 'NOMINATED', 'ok');
+      if (rttMs === null && s.currentRoundTripTime !== undefined)
+        rttMs = Math.round(s.currentRoundTripTime * 1000);
+    }
+  });
 
-      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(`${proto}//${location.host}`);
+  if (rttMs !== null) {
+    set('s-rtt', rttMs + ' ms', rttMs > 100 ? 'warn' : 'ok');
+    rttHistory.push(rttMs);
+    if (rttHistory.length > SPARK_LEN) rttHistory.shift();
+  }
 
-      ws.onopen = () => ws.send(JSON.stringify({ type: 'offer-request' }));
-      ws.onerror = () => { set('s-status', 'WS ERROR', 'err'); hangup(); };
+  prevTs = now;
+  if (pc) set('s-ice', pc.iceConnectionState.toUpperCase(), iceClass(pc.iceConnectionState));
 
-      ws.onmessage = async ({ data }) => {
-        const msg = JSON.parse(data);
+  drawSpark('spark-rtt',    rttHistory,    '#39ff14', 200);
+  drawSpark('spark-jitter', jitterHistory, '#f5a623',  50);
+}
 
-        if (msg.type === 'offer') {
-          pc = new RTCPeerConnection({ iceServers: [] });
+// ── Connect ──────────────────────────────────────────────────────────────────
+function toggle() { active ? hangup() : connect(); }
 
-          pc.onicecandidate = ({ candidate }) => {
-            if (candidate) ws.send(JSON.stringify({ type: 'candidate', candidate }));
-          };
+async function connect() {
+  btn.disabled = true;
+  btn.classList.add('tuning');
+  btn.textContent = 'TUNING...';
+  set('s-status', 'CONNECTING', 'warn');
 
-          pc.oniceconnectionstatechange = () =>
-            set('s-ice', pc.iceConnectionState.toUpperCase(), iceClass(pc.iceConnectionState));
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${proto}//${location.host}`);
 
-          pc.onconnectionstatechange = () => {
-            const s = pc.connectionState;
-            if (s === 'connected') onConnected();
-            if (['failed', 'disconnected', 'closed'].includes(s)) hangup();
-          };
+  ws.onopen  = () => ws.send(JSON.stringify({ type: 'offer-request' }));
+  ws.onerror = () => { set('s-status', 'WS ERROR', 'err'); hangup(); };
 
-          pc.ontrack = ({ track, streams }) => {
-            const stream = streams.length > 0 ? streams[0] : new MediaStream([track]);
-            audioEl.srcObject = stream;
+  ws.onmessage = async ({ data }) => {
+    const msg = JSON.parse(data);
 
-            // Read candidate type once connected
-            setTimeout(async () => {
-              if (!pc) return;
-              const st = await pc.getStats();
-              st.forEach(s => {
-                if (s.type === 'local-candidate' && s.candidateType)
-                  set('s-candidate', s.candidateType.toUpperCase(), 'ok');
-              });
-            }, 1500);
+    if (msg.type === 'offer') {
+      pc = new RTCPeerConnection({ iceServers: [] });
 
-            // Web Audio — separate L/R analysers for VU meter
-            const ctx = new AudioContext();
-            ctx.resume().then(() => {
-              const src = ctx.createMediaStreamSource(stream);
-              const splitter = ctx.createChannelSplitter(2);
-              const aL = ctx.createAnalyser();
-              const aR = ctx.createAnalyser();
-              [aL, aR].forEach(a => { a.fftSize = 256; a.smoothingTimeConstant = 0.5; });
-              src.connect(splitter);
-              splitter.connect(aL, 0);
-              splitter.connect(aR, 1);
-              analyser = { L: aL, R: aR };
-              drawVU();
-            });
-          };
-
-          await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          ws.send(JSON.stringify({ type: 'answer', sdp: pc.localDescription }));
-        }
-
-        if (msg.type === 'candidate' && pc) {
-          try { await pc.addIceCandidate(msg.candidate); } catch { }
-        }
+      pc.onicecandidate = ({ candidate }) => {
+        if (candidate) ws.send(JSON.stringify({ type: 'candidate', candidate }));
       };
+
+      pc.oniceconnectionstatechange = () =>
+        set('s-ice', pc.iceConnectionState.toUpperCase(), iceClass(pc.iceConnectionState));
+
+      pc.onconnectionstatechange = () => {
+        const s = pc.connectionState;
+        if (s === 'connected') onConnected();
+        if (['failed', 'disconnected', 'closed'].includes(s)) hangup();
+      };
+
+      pc.ontrack = ({ track, streams }) => {
+        const stream = streams.length > 0 ? streams[0] : new MediaStream([track]);
+        audioEl.srcObject = stream;
+
+        // Pin jitter buffer to minimum on LAN — NetEQ's adaptive algorithm will
+        // continuously try to grow the buffer based on measured jitter. We counter
+        // this by resetting it every 100ms. This is aggressive but safe on LAN
+        // where true jitter is ~0ms and packet loss is ~0%.
+        const minimizeJitter = () => {
+          if (!pc) return;
+          pc.getReceivers().forEach(r => {
+            if (r.track.kind !== 'audio' || r.track.readyState !== 'live') return;
+            try { r.jitterBufferTarget = 0; }     catch {}  // spec: Chrome 110+, Firefox 113+
+            try { r.playoutDelayHint = 0; }       catch {}  // legacy Chrome
+            try { r.jitterBufferDelayHint = 0; }  catch {}  // origin trial name
+          });
+        };
+        minimizeJitter();
+        const jitterTimer = setInterval(minimizeJitter, 100); // 100ms — fast enough to beat NetEQ
+        track.addEventListener('ended', () => clearInterval(jitterTimer), { once: true });
+
+        // Read candidate type once connected
+        setTimeout(async () => {
+          if (!pc) return;
+          const st = await pc.getStats();
+          st.forEach(s => {
+            if (s.type === 'local-candidate' && s.candidateType)
+              set('s-candidate', s.candidateType.toUpperCase(), 'ok');
+          });
+        }, 1500);
+
+        // Web Audio — separate L/R analysers for VU meter
+        const ctx = new AudioContext();
+        ctx.resume().then(() => {
+          const src      = ctx.createMediaStreamSource(stream);
+          const splitter = ctx.createChannelSplitter(2);
+          const aL = ctx.createAnalyser();
+          const aR = ctx.createAnalyser();
+          [aL, aR].forEach(a => { a.fftSize = 256; a.smoothingTimeConstant = 0.5; });
+          src.connect(splitter);
+          splitter.connect(aL, 0);
+          splitter.connect(aR, 1);
+          analyser = { L: aL, R: aR };
+          drawVU();
+        });
+      };
+
+      await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      ws.send(JSON.stringify({ type: 'answer', sdp: pc.localDescription }));
     }
 
-    function onConnected() {
-      active = true;
-      btn.disabled = false;
-      btn.classList.remove('tuning');
-      btn.textContent = 'TUNE OUT';
-      set('s-status', 'ON AIR', 'ok');
-      document.getElementById('on-air').classList.add('visible');
-      statsTimer = setInterval(pollStats, 1000);
-      pollStats();
+    if (msg.type === 'candidate' && pc) {
+      try { await pc.addIceCandidate(msg.candidate); } catch {}
     }
+  };
+}
 
-    // ── Hangup ───────────────────────────────────────────────────────────────────
-    function hangup() {
-      active = false;
-      if (statsTimer) { clearInterval(statsTimer); statsTimer = null; }
-      if (vuRaf) { cancelAnimationFrame(vuRaf); vuRaf = null; }
-      if (pc) { pc.close(); pc = null; }
-      if (ws) { ws.close(); ws = null; }
-      analyser = null;
-      audioEl.srcObject = null;
+function onConnected() {
+  active = true;
+  btn.disabled = false;
+  btn.classList.remove('tuning');
+  btn.textContent = 'TUNE OUT';
+  set('s-status', 'ON AIR', 'ok');
+  document.getElementById('on-air').classList.add('visible');
+  statsTimer = setInterval(pollStats, 1000);
+  pollStats();
+}
 
-      [...barsL, ...barsR].forEach(b => b.className = 'vu-bar');
-      btn.disabled = false;
-      btn.classList.remove('tuning');
-      btn.textContent = 'TUNE IN';
-      document.getElementById('on-air').classList.remove('visible');
+// ── Hangup ───────────────────────────────────────────────────────────────────
+function hangup() {
+  active = false;
+  if (statsTimer) { clearInterval(statsTimer); statsTimer = null; }
+  if (vuRaf)      { cancelAnimationFrame(vuRaf); vuRaf = null; }
+  if (pc)         { pc.close();  pc = null; }
+  if (ws)         { ws.close();  ws = null; }
+  analyser = null;
+  audioEl.srcObject = null;
 
-      STAT_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.textContent = id === 's-status' ? 'STANDBY' : '—'; el.className = 'stat-v'; }
-      });
+  [...barsL, ...barsR].forEach(b => b.className = 'vu-bar');
+  btn.disabled = false;
+  btn.classList.remove('tuning');
+  btn.textContent = 'TUNE IN';
+  document.getElementById('on-air').classList.remove('visible');
 
-      ['spark-rtt', 'spark-jitter'].forEach(id => {
-        const c = document.getElementById(id);
-        if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
-      });
+  STAT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = id === 's-status' ? 'STANDBY' : '—'; el.className = 'stat-v'; }
+  });
 
-      rttHistory.length = jitterHistory.length = 0;
-      prevBytes = prevTs = 0;
-    }
+  ['spark-rtt', 'spark-jitter'].forEach(id => {
+    const c = document.getElementById(id);
+    if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  });
 
-    // ── VU meter ─────────────────────────────────────────────────────────────────
-    function drawVU() {
-      if (!analyser) return;
+  rttHistory.length = jitterHistory.length = 0;
+  prevBytes = prevTs = 0;
+}
 
-      function level(node) {
-        const d = new Uint8Array(node.frequencyBinCount);
-        node.getByteFrequencyData(d);
-        let s = 0;
-        for (const v of d) s += v * v;
-        return Math.min(1, Math.sqrt(s / d.length) / 255 * 4);
-      }
+// ── VU meter ─────────────────────────────────────────────────────────────────
+function drawVU() {
+  if (!analyser) return;
 
-      const lL = Math.round(level(analyser.L) * N_VU);
-      const lR = Math.round(level(analyser.R) * N_VU);
+  function level(node) {
+    const d = new Uint8Array(node.frequencyBinCount);
+    node.getByteFrequencyData(d);
+    let s = 0;
+    for (const v of d) s += v * v;
+    return Math.min(1, Math.sqrt(s / d.length) / 255 * 4);
+  }
 
-      barsL.forEach((b, i) => {
-        const p = i / N_VU;
-        b.className = i < lL ? 'vu-bar on' + (p > .87 ? ' clip' : p > .72 ? ' peak' : '') : 'vu-bar';
-      });
-      barsR.forEach((b, i) => {
-        const p = i / N_VU;
-        b.className = i < lR ? 'vu-bar on' + (p > .87 ? ' clip' : p > .72 ? ' peak' : '') : 'vu-bar';
-      });
+  const lL = Math.round(level(analyser.L) * N_VU);
+  const lR = Math.round(level(analyser.R) * N_VU);
 
-      vuRaf = requestAnimationFrame(drawVU);
-    }
-  </script>
+  barsL.forEach((b, i) => {
+    const p = i / N_VU;
+    b.className = i < lL ? 'vu-bar on' + (p > .87 ? ' clip' : p > .72 ? ' peak' : '') : 'vu-bar';
+  });
+  barsR.forEach((b, i) => {
+    const p = i / N_VU;
+    b.className = i < lR ? 'vu-bar on' + (p > .87 ? ' clip' : p > .72 ? ' peak' : '') : 'vu-bar';
+  });
+
+  vuRaf = requestAnimationFrame(drawVU);
+}
+</script>
 </body>
-
 </html>
