@@ -4,7 +4,7 @@ Stream audio from your PC to any device on your local network with **sub-200ms l
 
 ```
 Spotify / any audio  →  FFmpeg (capture)  →  Node.js (WebRTC)  →  Browser on any device
-      on your PC           WASAPI loopback       Opus 96 kbps         phone / TV / tablet
+      on your PC           WASAPI loopback       Opus 32 kbps         phone / TV / tablet
 ```
 
 ---
