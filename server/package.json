@@ -1,0 +1,17 @@
+{
+  "name": "lan-radio",
+  "version": "1.0.0",
+  "description": "Sub-200ms LAN audio broadcast over WebRTC",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@roamhq/wrtc": "0.10.0",
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
