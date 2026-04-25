@@ -99,15 +99,21 @@ This multiplies the captured signal so it stays loud even at lower system volume
 
 ## Installation
 
+<<<<<<< HEAD
 **1. Clone and install dependencies:**
 ```cmd
 git clone https://github.com/your-username/lan-radio.git
 cd lan-radio\server
+=======
+```cmd
+cd server
+>>>>>>> 444fcd688f3c4146899582557ce18d4dfd2cf32b
 npm install
 ```
 
 > `@roamhq/wrtc` downloads a prebuilt native binary — no compilation needed. Takes ~30 seconds.
 
+<<<<<<< HEAD
 **2. Configure your environment:**
 ```cmd
 cd ..
@@ -135,12 +141,32 @@ AUDIO_DEVICE=CABLE Output (VB-Audio Virtual Cable)
 # VOLUME_BOOST=6
 ```
 
+=======
+>>>>>>> 444fcd688f3c4146899582557ce18d4dfd2cf32b
 ---
 
 ## Running
 
+<<<<<<< HEAD
 ```cmd
 cd server
+=======
+**With VB-Cable (default):**
+```cmd
+node index.js
+```
+
+**With Stereo Mix:**
+```cmd
+set AUDIO_DEVICE=Stereo Mix (Realtek(R) Audio)
+set VOLUME_BOOST=6
+node index.js
+```
+
+**Custom port:**
+```cmd
+set PORT=8080
+>>>>>>> 444fcd688f3c4146899582557ce18d4dfd2cf32b
 node index.js
 ```
 
@@ -228,15 +254,22 @@ netsh advfirewall firewall add rule name="LAN Radio" dir=in action=allow protoco
 
 ```
 lan-radio/
+<<<<<<< HEAD
 ├── .env.example          config template — copy to .env and edit
 ├── .env                  your local config (gitignored)
 ├── .gitignore
 ├── README.md
+=======
+>>>>>>> 444fcd688f3c4146899582557ce18d4dfd2cf32b
 ├── server/
 │   ├── index.js          Node.js WebRTC broadcast server
 │   └── package.json
 └── client/
+<<<<<<< HEAD
     └── index.html        browser tuner UI (served by the server)
+=======
+    └── index.html        Browser tuner UI (served by the server)
+>>>>>>> 444fcd688f3c4146899582557ce18d4dfd2cf32b
 ```
 
 ---
@@ -251,4 +284,8 @@ lan-radio/
 | WebRTC in Node | [@roamhq/wrtc](https://github.com/WonderInventions/node-webrtc) |
 | Signaling | WebSocket (ws) |
 | HTTP server | Express |
+<<<<<<< HEAD
 | Client | Vanilla JS + Web Audio API |
+=======
+| Client | Vanilla JS + Web Audio API |
+>>>>>>> 444fcd688f3c4146899582557ce18d4dfd2cf32b
