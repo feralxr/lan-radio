@@ -10,22 +10,22 @@ const { networkInterfaces } = require('os');
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const PORT        = process.env.PORT        || 3000;
-const AUDIO_DEV   = process.env.AUDIO_DEVICE || 'CABLE Output (VB-Audio Virtual Cable)';
+const PORT = process.env.PORT || 3000;
+const AUDIO_DEV = process.env.AUDIO_DEVICE || 'CABLE Output (VB-Audio Virtual Cable)';
 const SAMPLE_RATE = 48000;
-const CHANNELS    = 2;
-const FRAME_MS    = 10;   // Opus frame size — valid: 2.5 5 10 20 40 60 ms
-const VOLUME_BOOST = 8;   // multiply gain — keeps broadcast loud regardless of host volume
+const CHANNELS = 2;
+const FRAME_MS = 10;   // Opus frame size — valid: 2.5 5 10 20 40 60 ms
+// const VOLUME_BOOST = 8;   // multiply gain — keeps broadcast loud regardless of host volume
 
 const SAMPLES_PER_CHANNEL = (SAMPLE_RATE * FRAME_MS) / 1000;  // 480
-const BYTES_PER_FRAME     = SAMPLES_PER_CHANNEL * CHANNELS * 2; // 1920
+const BYTES_PER_FRAME = SAMPLES_PER_CHANNEL * CHANNELS * 2; // 1920
 
 // ---------------------------------------------------------------------------
 // HTTP + WebSocket server
 // ---------------------------------------------------------------------------
-const app    = express();
+const app = express();
 const server = http.createServer(app);
-const wss    = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server });
 
 app.use(express.static(path.join(__dirname, '../client')));
 
@@ -33,10 +33,10 @@ app.use(express.static(path.join(__dirname, '../client')));
 // WebRTC audio source — single source shared across all peers
 // ---------------------------------------------------------------------------
 const audioSource = new RTCAudioSource();
-const audioTrack  = audioSource.createTrack();
+const audioTrack = audioSource.createTrack();
 
 const peers = new Map();
-let   peerId = 0;
+let peerId = 0;
 
 // ---------------------------------------------------------------------------
 // PCM carry buffer — FFmpeg sends arbitrary chunk sizes;
@@ -60,9 +60,9 @@ function pushPCM(chunk) {
     try {
       audioSource.onData({
         samples,
-        sampleRate:     SAMPLE_RATE,
-        bitsPerSample:  16,
-        channelCount:   CHANNELS,
+        sampleRate: SAMPLE_RATE,
+        bitsPerSample: 16,
+        channelCount: CHANNELS,
         numberOfFrames: SAMPLES_PER_CHANNEL, // frames per channel = 480
       });
     } catch (e) {
@@ -79,21 +79,21 @@ function startFFmpeg() {
 
   const ff = spawn('ffmpeg', [
     // Low-latency input flags
-    '-fflags',          'nobuffer',
-    '-flags',           'low_delay',
-    '-probesize',       '32',
+    '-fflags', 'nobuffer',
+    '-flags', 'low_delay',
+    '-probesize', '32',
     '-analyzeduration', '0',
 
     // DirectShow input — 20ms capture buffer (default is 500ms)
-    '-f',                'dshow',
+    '-f', 'dshow',
     '-audio_buffer_size', '20',
-    '-i',                `audio=${AUDIO_DEV}`,
+    '-i', `audio=${AUDIO_DEV}`,
 
     // Boost volume so host system volume doesn't affect broadcast level
-    '-af', `volume=${VOLUME_BOOST}`,
+    // '-af', `volume=${VOLUME_BOOST}`,
 
     // Raw signed 16-bit little-endian PCM output
-    '-f',  's16le',
+    '-f', 's16le',
     '-ar', String(SAMPLE_RATE),
     '-ac', String(CHANNELS),
     'pipe:1',
@@ -181,7 +181,7 @@ wss.on('connection', ws => {
     if (msg.type === 'candidate') {
       const pc = peers.get(id);
       if (pc && msg.candidate) {
-        try { await pc.addIceCandidate(msg.candidate); } catch {}
+        try { await pc.addIceCandidate(msg.candidate); } catch { }
       }
     }
   });
